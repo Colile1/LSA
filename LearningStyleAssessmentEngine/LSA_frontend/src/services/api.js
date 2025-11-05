@@ -11,7 +11,7 @@ import axios from 'axios';
 // Create an axios instance with a predefined base URL.
 // This makes it easy to change the API endpoint for development vs. production.
 const apiClient = axios.create({
-    baseURL: '/api',
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api',
     headers: {
         'Content-Type': 'application/json'
     }
@@ -95,3 +95,4 @@ const apiService = {
     getAdvancedRecommendations
 };
 
+export default apiService;
