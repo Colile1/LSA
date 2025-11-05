@@ -9,27 +9,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- Middleware ---
-// Enable Cross-Origin Resource Sharing (CORS) for all routes
-app.use(cors());
-
-// Parse incoming request bodies in a middleware before your handlers, available under the req.body property.
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // --- API Routes ---
-// Placeholder for future routes
-// const assessmentRoutes = require('./api/assessmentRoutes');
-// const resultsRoutes = require('./api/resultsRoutes');
-// const mlProxyRoutes = require('./api/mlProxyRoutes');
+// Import the route handlers
+const assessmentRoutes = require('./api/assessmentRoutes');
+const resultsRoutes = require('./api/resultsRoutes');
+const mlProxyRoutes = require('./api/mlProxyRoutes');
 
-// app.use('/api/assessment', assessmentRoutes);
-// app.use('/api/results', resultsRoutes);
-// app.use('/api/ml', mlProxyRoutes);
+// Register the route handlers
+app.use('/api/assessment', assessmentRoutes);
+app.use('/api/results', resultsRoutes);
+app.use('/api/ml', mlProxyRoutes);
 
-
-// --- Root Route ---
-// A simple route to confirm that the server is running
+// --- Root Route for Health Check ---
 app.get('/', (req, res) => {
     res.status(200).json({ 
         message: 'Welcome to the LSA_backend API for the 4C Learning App!',
@@ -37,10 +32,10 @@ app.get('/', (req, res) => {
     });
 });
 
-
 // --- Start the Server ---
 app.listen(PORT, () => {
-    console.log(`LSA_backend server is listening on port ${PORT}`);
+    console.log(`LSA_backend server is listening on http://localhost:${PORT}`);
 });
 
-module.exports = app; // For testing purposes
+// Export the app for testing purposes
+module.exports = app;
