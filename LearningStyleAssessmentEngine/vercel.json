@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "LSA_backend/src/app.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "LSA_frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/LSA_backend/src/app.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/LSA_frontend/$1"
+    }
+  ]
+}
