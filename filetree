@@ -1,0 +1,61 @@
+LearningStyleAssessmentEngine
+LearningStyleAssessmentEngine/
+├── LSA_backend/
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── assessmentRoutes.js
+│   │   │   ├── resultsRoutes.js
+│   │   │   └── mlProxyRoutes.js
+│   │   ├── components/
+│   │   │   ├── vark/
+│   │   │   │   ├── questions.js
+│   │   │   │   └── scoring.js
+│   │   │   ├── programming-scenarios/
+│   │   │   │   ├── questions.js
+│   │   │   │   └── scoring.js
+│   │   │   ├── learning-preferences/
+│   │   │   │   ├── questions.js
+│   │   │   │   └── scoring.js
+│   │   │   ├── interactive-exercises/
+│   │   │   │   ├── exercises.js
+│   │   │   │   └── scoring.js
+│   │   │   └── background/
+│   │   │       ├── questions.js
+│   │   │       └── scoring.js
+│   │   ├── services/
+│   │   │   ├── assessmentService.js
+│   │   │   └── databaseService.js
+│   │   ├── utils/
+│   │   │   └── recommendationEngine.js
+│   │   └── app.js
+│   ├── tests/
+│   │   ├── assessment.test.js
+│   │   └── scoring.test.js
+│   └── package.json
+│
+├── LSA_frontend/
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── assessment/
+│   │   │   │   ├── VARKTest.js
+│   │   │   │   ├── ProgrammingScenarioTest.js
+│   │   │   │   ├── LearningPreferenceSurvey.js
+│   │   │   │   ├── InteractiveExercise.js
+│   │   │   │   └── BackgroundQuestionnaire.js
+│   │   │   ├── common/
+│   │   │   │   ├── Question.js
+│   │   │   │   └── ProgressTracker.js
+│   │   │   └── results/
+│   │   │       ├── ResultsPage.js
+│   │   │       ├── ScoreBreakdown.js
+│   │   │       └── Recommendations.js
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   ├── App.js
+│   │   ├── App.css
+│   │   └── index.js
+│   └── package.json
+│
+└── README.md
