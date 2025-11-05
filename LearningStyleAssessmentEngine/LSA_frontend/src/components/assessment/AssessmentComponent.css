@@ -1,0 +1,17 @@
+.assessment-component {
+    width: 100%;
+    max-width: 700px;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: left;
+}
+.assessment-component h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.error-message {
+    color: #c0392b;
+    font-weight: bold;
+}
