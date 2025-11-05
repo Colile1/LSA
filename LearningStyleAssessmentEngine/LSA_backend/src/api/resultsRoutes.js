@@ -4,66 +4,89 @@
 const express = require('express');
 const router = express.Router();
 
-// Import all scoring functions and the recommendation engine
+// Import scoring logic, recommendation engine, and the new database service
 const { scoreVark } = require('../../components/vark/scoring');
 const { scoreProgrammingScenarios } = require('../../components/programming-scenarios/scoring');
 const { scoreLearningPreferences } = require('../../components/learning-preferences/scoring');
 const { scoreInteractiveExercises } = require('../../components/interactive-exercises/scoring');
 const { processBackground } = require('../../components/background/scoring');
 const { generateRecommendation } = require('../../utils/recommendationEngine');
+const db = require('../services/databaseService'); // Import the database service
 
-// Import question data needed for context in scoring
+// Import question data for context
 const learningPreferenceQuestions = require('../../components/learning-preferences/questions');
 const interactiveExercises = require('../../components/interactive-exercises/exercises');
 
 // @route   POST api/results/submit
-// @desc    Submit all assessment answers and get a preliminary recommendation
+// @desc    Submit all assessment answers, get recommendation, and save the result
 // @access  Public
-router.post('/submit', (req, res) => {
+router.post('/submit', async (req, res) => {
     const { vark, scenarios, preferences, interactive, background, userId } = req.body;
 
-    // Validate that all parts of the assessment are present
     if (!vark || !scenarios || !preferences || !interactive || !background) {
         return res.status(400).json({ msg: 'Incomplete assessment data. All five sections are required.' });
     }
 
     try {
-        // --- 1. Score each component ---
+        // Score each component
         const varkScores = scoreVark(vark);
         const scenarioScores = scoreProgrammingScenarios(scenarios);
         const preferenceScores = scoreLearningPreferences(preferences, learningPreferenceQuestions);
         const interactiveScores = scoreInteractiveExercises(interactive, interactiveExercises);
         const backgroundProfile = processBackground(background);
 
-        // --- 2. Generate the preliminary recommendation using the combined scores ---
+        // Generate the preliminary recommendation
         const recommendation = generateRecommendation(varkScores, scenarioScores, interactiveScores, preferenceScores);
 
-        // --- 3. Assemble the complete result object ---
+        // Assemble the complete result object
         const finalResult = {
             userId: userId || 'anonymous',
             submittedAt: new Date().toISOString(),
-            ...recommendation, // Includes primaryStyle, finalScores, and recommendationText
-            detailedScores: {
-                vark: varkScores,
-                scenarios: scenarioScores,
-                interactive: interactiveScores,
-                preferences: preferenceScores
-            },
+            ...recommendation,
+            detailedScores: { vark: varkScores, scenarios: scenarioScores, interactive: interactiveScores, preferences: preferenceScores },
             backgroundProfile: backgroundProfile,
-            rawAnswers: req.body // Store the raw answers for potential re-analysis
+            rawAnswers: req.body
         };
 
-        // --- 4. For now, we just log the result. Later, this will save to a database. ---
-        console.log('--- New Assessment Result ---');
-        console.log(JSON.stringify(finalResult, null, 2));
-        console.log('-----------------------------');
+        // --- Save the result using the Database Service ---
+        const savedRecord = await db.saveResult(finalResult);
+        console.log(`Result saved with ID: ${savedRecord.id}`);
 
-        // --- 5. Return the final result to the client ---
-        res.status(200).json(finalResult);
+        // Return the saved record to the client (which now includes a database ID)
+        res.status(201).json(savedRecord);
 
     } catch (error) {
         console.error('Error processing assessment results:', error);
         res.status(500).json({ msg: 'A server error occurred while processing the assessment.' });
+    }
+});
+
+// @route   GET api/results
+// @desc    Get all saved assessment results
+// @access  Public (for demonstration; should be protected in production)
+router.get('/', async (req, res) => {
+    try {
+        const allResults = await db.getAllResults();
+        res.status(200).json(allResults);
+    } catch (error) {
+        console.error('Error retrieving all results:', error);
+        res.status(500).json({ msg: 'Server error while retrieving results.' });
+    }
+});
+
+// @route   GET api/results/:id
+// @desc    Get a single assessment result by its ID
+// @access  Public
+router.get('/:id', async (req, res) => {
+    try {
+        const result = await db.getResultById(req.params.id);
+        if (!result) {
+            return res.status(404).json({ msg: 'Result not found.' });
+        }
+        res.status(200).json(result);
+    } catch (error) {
+        console.error(`Error retrieving result with id ${req.params.id}:`, error);
+        res.status(500).json({ msg: 'Server error while retrieving result.' });
     }
 });
 
